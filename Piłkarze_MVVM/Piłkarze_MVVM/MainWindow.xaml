@@ -1,0 +1,66 @@
+﻿<Window x:Class="Piłkarze_MVVM.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        
+        xmlns:vm="clr-namespace:Piłkarze_MVVM.VievModel"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        
+        xmlns:local="clr-namespace:Piłkarze_MVVM"
+        mc:Ignorable="d"
+        Title="Drużyna" Height="450" Width="800" 
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        >
+
+    <Window.Resources>
+        <vm:Operations x:Key="operations"/>
+    </Window.Resources>
+
+    <Grid x:Name="mainGrid" DataContext="{StaticResource operations}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.5*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" Margin="0, 10, 0, 0">
+            <StackPanel Orientation="Horizontal" Margin="10">
+                <TextBlock Text="Imię" Width="100" Height="20"/>
+                <local:TextBoxWithErrorProvider x:Name="NameTextBoxWEP" Foreground="Gray" Width="100" Height="20"
+                                                Text="{Binding Path=CurrentName, Mode=TwoWay}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10">
+                <TextBlock Text="Nazwisko" Width="100" Height="20"/>
+                <local:TextBoxWithErrorProvider x:Name="SurnameTextBoxWEP" Foreground="Gray" Width="100" Height="20"
+                                                Text="{Binding Path=CurrentSurname, Mode=TwoWay}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10">
+                <TextBlock Text="Wiek" Width="100" Height="20"/>
+                <ComboBox Name="ageComboBox" Width="50" Height="20" ItemsSource="{Binding Path=ListOfYears}" 
+                          Text="{Binding Path=CurrentAge, Mode=TwoWay}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10">
+                <TextBlock Text="Waga" Width="100" Height="20"/>
+                <Slider Name="weightSlider" Width="150" Height="20" Minimum="55" Maximum="100" TickFrequency="0.1" IsSnapToTickEnabled="True" Value="{Binding Path=CurrentWeight}"/>
+                <TextBlock Width="25" Height="20" Margin="5,0,0,0" Text="{Binding ElementName=weightSlider, Path=Value}"/>
+                <TextBlock Text="kg"/>
+            </StackPanel>
+            <Button Width="80" Height="20" Margin="10" Content="Dodaj" Command="{Binding AddPlayer}"/>
+            <Button Width="80" Height="20" Margin="10" Content="Usuń" Command="{Binding DeletePlayer}"/>
+            <Button Width="80" Height="20" Margin="10" Content="Modyfikuj" Command="{Binding ModifyPlayer}"/>
+        </StackPanel>
+        <ListBox Grid.Column="1" Name="playersListBox" Margin="0, 10, 0, 0" ItemsSource="{Binding ListOfPlayers}" SelectedIndex="{Binding CurrentIndex}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding LoadPlayerData}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ListBox>
+    </Grid>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding ElementName = mainGrid, Path = DataContext.SavePlayersToFile}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+</Window>
